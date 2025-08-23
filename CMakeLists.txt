@@ -11,6 +11,7 @@ set(CMAKE_C_STANDARD 99)#C99 # lvgl officially support C99 and above
 set(CMAKE_CXX_STANDARD 17)#C17
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 find_package(SDL2 REQUIRED SDL2)
@@ -21,6 +22,7 @@ add_compile_definitions($<$<BOOL:${LV_USE_LIBJPEG_TURBO}>:LV_USE_LIBJPEG_TURBO=1
 add_compile_definitions($<$<BOOL:${LV_USE_FFMPEG}>:LV_USE_FFMPEG=1>)
 
 add_subdirectory(lvgl)
+add_subdirectory(components)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
 
 add_executable(main main.c mouse_cursor_icon.c)
@@ -28,6 +30,13 @@ add_executable(main main.c mouse_cursor_icon.c)
 target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
 target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} m pthread)
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+
+# C++ version
+add_executable(main_cpp main.cpp mouse_cursor_icon.c)
+
+target_compile_definitions(main_cpp PRIVATE LV_CONF_INCLUDE_SIMPLE)
+target_link_libraries(main_cpp lvgl lvgl::examples lvgl::demos lvgl::thorvg component_iface component_lv8 ${SDL2_LIBRARIES} m pthread)
+add_custom_target (run_cpp COMMAND ${EXECUTABLE_OUTPUT_PATH}/main_cpp DEPENDS main_cpp)
 
 if(LV_USE_DRAW_SDL)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
