@@ -9,3 +9,8 @@ demo
 build/
 bin/
 cmake/
+.clang-format
+.vscode/
+compile_commands.json
+.cache
+

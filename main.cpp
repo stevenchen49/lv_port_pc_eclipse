@@ -222,10 +222,12 @@ int main(int argc, char **argv)
         static std::shared_ptr<Gui::Button> button = std::make_shared<Gui::Button>();
         
         button->genObjectSync(lv_screen_active())
-            .setConfig(Gui::ButtonConfig::defaultConfig())
-            .setPos(10, 10)
-            .setSize(100, 50)
+            .setPos(Gui::ComponentConfig::Pos(10, 10, 100, 50))
             .show();
+        
+        // 使用 ButtonConfig 配置按钮
+        Gui::ButtonConfig config = Gui::ButtonConfig::primaryConfig("Click Me");
+        button->setConfig(config);
 
         // Run the demo
         // if (!app.runDemo(argc, argv)) {

@@ -1,0 +1,214 @@
+# Components 子模块代码风格规范
+
+## 1. 文件组织
+
+### 1.1 头文件
+- 使用 `#pragma once` 作为头文件保护
+- 按顺序包含头文件：系统库、第三方库、项目库
+- 使用 `namespace Gui` 包装所有 GUI 组件
+- 放置在 `components/iface/` 目录中
+
+### 1.2 源文件
+- 实现在 `components/impls/` 目录中
+- 保持接口和实现分离
+
+## 2. 命名规范
+
+### 2.1 类名
+- 使用 PascalCase：`Button`, `Component`, `ButtonConfig`
+- 清晰描述性的名称
+
+### 2.2 方法名
+- 使用 camelCase：`createObject()`, `setButtonText()`, `getButtonState()`
+- 使用动词前缀：`set`, `get`, `create`, `apply`, `show`, `hide`
+- 流畅接口方法返回 `*this`
+
+### 2.3 变量名
+- 成员变量使用 `m` 前缀：`mButtonConfig`, `mButtonText`
+- 局部变量使用 camelCase：`buttonConfig`, `parentObj`
+- 常量使用 UPPER_CASE：`LV_DEF_REFR_PERIOD`
+
+### 2.4 文件名
+- 头文件：`Button.h`, `Component.h`
+- 源文件：`Button.cpp`, `Component.cpp`
+- 配置文件：`ButtonConfig.h`, `ComponentConfig.h`
+
+## 3. 代码格式
+
+### 3.1 缩进
+- 使用 4 个空格（不使用 Tab）
+- 在 `.editorconfig` 中配置
+
+### 3.2 括号风格
+- K&R 风格（开括号在同一行）
+- 函数和类定义换行
+
+### 3.3 空格使用
+- 操作符前后加空格：`a + b`
+- 逗号后加空格：`func(a, b, c)`
+- 关键字后加空格：`if (condition)`
+
+### 3.4 行长度
+- 保持不超过 120 字符
+- 适当换行长行
+
+## 4. 文档风格
+
+### 4.1 文件头
+```cpp
+/**
+ * @file Button.h
+ * @brief Button component header
+ */
+```
+
+### 4.2 类文档
+```cpp
+/**
+ * @brief Button component
+ * 
+ * LVGL button component wrapper
+ */
+```
+
+### 4.3 方法文档
+```cpp
+/**
+ * @brief Set button text
+ * @param text Button display text
+ * @return Reference to this object for chaining
+ */
+```
+
+### 4.4 代码块注释
+- 使用 `// ==================== Section Title ====================` 格式
+- 保持注释简洁，使用英文
+- 不在 Doxygen 中写使用例子（按需单独提供）
+
+## 5. C++ 特定规则
+
+### 5.1 类设计
+- 使用 RAII 原则
+- 提供构造函数和析构函数
+- 使用 `override` 关键字标记虚函数
+- 支持流畅接口，返回 `*this`
+
+### 5.2 内存管理
+- 优先使用智能指针
+- 避免裸指针，除了 LVGL 对象（`lv_obj_t*`）
+- 在析构函数中清理资源
+
+### 5.3 异常处理
+- 使用返回值表示错误状态
+- 避免异常，使用错误码或布尔返回值
+
+### 5.4 方法组织
+```cpp
+public:
+    // 构造函数/析构函数
+    Button();
+    Button(const ButtonConfig& config);
+    virtual ~Button();
+
+    // 核心方法
+    lv_obj_t* createObject(lv_obj_t* parent) override;
+    void applyButtonConfig();
+
+    // ==================== 按钮特有方法 ====================
+    Button& setConfig(const ButtonConfig& config);
+    Button& setButtonText(const std::string& text);
+
+    // ==================== 便捷方法 ====================
+    Button& show();
+    Button& hide();
+
+protected:
+    // 受保护的辅助方法
+    void applyButtonStyle();
+    static lv_obj_t* _lvCreateButton(lv_obj_t* parent);
+
+private:
+    // 私有成员变量
+    ButtonConfig mButtonConfig;     ///< Button configuration
+    std::string mButtonText;        ///< Button text
+};
+```
+
+## 6. 配置类
+
+### 6.1 结构设计
+```cpp
+struct ButtonConfig
+{
+    struct State {
+        uint32_t normalBgColor = ColorConfig::Primary;
+        uint32_t pressedBgColor = ColorConfig::PrimaryDark;
+        // ... 其他成员
+    };
+
+    // ==================== 成员变量 ====================
+    State state;                    ///< Button state configuration
+    std::string buttonText;         ///< Button text
+    bool toggleMode = false;        ///< Toggle mode flag
+
+    // ==================== 构造函数 ====================
+    ButtonConfig() = default;
+    ButtonConfig(const std::string& text) : buttonText(text) {}
+
+    // ==================== 便捷方法 ====================
+    ButtonConfig& setButtonText(const std::string& text);
+};
+```
+
+### 6.2 配置模式
+- 使用结构体进行配置
+- 提供默认值
+- 包含常用操作的便捷方法
+- 支持流畅接口
+
+## 7. LVGL 集成
+
+### 7.1 静态辅助方法
+- 使用 `_lv` 前缀：`_lvCreateButton()`, `_lvSetButtonText()`
+- 处理直接的 LVGL API 调用
+- 保持在受保护/私有部分
+- 不直接在 iface 头文件中暴露 lvgl.h 头文件
+
+### 7.2 对象管理
+- 在成员变量中存储 `lv_obj_t*`
+- 需要时延迟创建对象
+- 创建对象后应用配置
+
+## 8. 最佳实践
+
+### 8.1 代码组织
+- 接口和实现分离
+- 使用配置类管理参数
+- 为常见用例提供工厂方法
+
+### 8.2 错误处理
+- 验证参数
+- 提供有意义的错误消息
+- 使用日志输出调试信息
+
+### 8.3 性能
+- 避免不必要的对象拷贝
+- 对大对象使用常量引用
+- 适当使用 `const` 限定符
+
+## 9. 工具配置
+
+### 9.1 EditorConfig
+```
+[*.{c,h,cpp,hpp}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+```
+
+### 9.2 编译器警告
+- 启用所有警告：`-Wall -Wextra`
+- 将警告视为错误：`-Werror`
+- 使用特定警告标志提高代码质量
