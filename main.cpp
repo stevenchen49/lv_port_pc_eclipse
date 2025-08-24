@@ -17,6 +17,12 @@
 
 #include "components/iface/Button.h"
 #include "components/iface/ButtonConfig.h"
+#include "components/iface/Checkbox.h"
+#include "components/iface/CheckboxConfig.h"
+#include "components/iface/Radio.h"
+#include "components/iface/RadioConfig.h"
+#include "components/iface/Switch.h"
+#include "components/iface/SwitchConfig.h"
 
 /*********************
  *      DEFINES
@@ -218,16 +224,93 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        // 创建按钮组件
-        static std::shared_ptr<Gui::Button> button = std::make_shared<Gui::Button>();
+        // 设置黑色主题背景
+        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(Gui::ColorConfig::Black), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_COVER, LV_PART_MAIN);
         
-        button->genObjectSync(lv_screen_active())
-            .setPos(Gui::ComponentConfig::Pos(10, 10, 100, 50))
+                // 创建按钮组件
+        static std::shared_ptr<Gui::Button> textButton = std::make_shared<Gui::Button>();
+        static std::shared_ptr<Gui::Button> greenButton = std::make_shared<Gui::Button>();
+        
+        textButton->genObjectSync(lv_screen_active())
+            .setConfig(Gui::ButtonConfig::prsText())
+            .setPos(Gui::ComponentConfig::Pos(50, 50, 100, 40))
             .show();
+
+        greenButton->genObjectSync(lv_screen_active())
+            .setConfig(Gui::ButtonConfig::prsPrimary())
+            .setPos(Gui::ComponentConfig::Pos(50, 200, 100, 40))
+            .show();
+            
+        // 创建复选框组件 - 展示四种状态
+        static std::shared_ptr<Gui::Checkbox> checkbox1 = std::make_shared<Gui::Checkbox>();
+        static std::shared_ptr<Gui::Checkbox> checkbox2 = std::make_shared<Gui::Checkbox>();
+        static std::shared_ptr<Gui::Checkbox> checkbox3 = std::make_shared<Gui::Checkbox>();
+        static std::shared_ptr<Gui::Checkbox> checkbox4 = std::make_shared<Gui::Checkbox>();
         
-        // 使用 ButtonConfig 配置按钮
-        Gui::ButtonConfig config = Gui::ButtonConfig::primaryConfig("Click Me");
-        button->setConfig(config);
+        // 从上到下：checked/unchecked/checked-disabled/unchecked-disabled
+        checkbox1->genObjectSync(lv_screen_active())
+            .setConfig(Gui::CheckboxConfig::defaultConfig().setChecked(true))
+            .setPos(Gui::ComponentConfig::Pos(200, 50, 30, 30))
+            .show();
+            
+        checkbox2->genObjectSync(lv_screen_active())
+            .setConfig(Gui::CheckboxConfig::defaultConfig().setChecked(false))
+            .setPos(Gui::ComponentConfig::Pos(200, 100, 30, 30))
+            .show();
+            
+        checkbox3->genObjectSync(lv_screen_active())
+            .setConfig(Gui::CheckboxConfig::defaultConfig().setChecked(true).setEnabled(false))
+            .setPos(Gui::ComponentConfig::Pos(200, 150, 30, 30))
+            .show();
+            
+        checkbox4->genObjectSync(lv_screen_active())
+            .setConfig(Gui::CheckboxConfig::defaultConfig().setChecked(false).setEnabled(false))
+            .setPos(Gui::ComponentConfig::Pos(200, 200, 30, 30))
+            .show();
+            
+        // 创建单选按钮组件 - 展示两种状态
+        static std::shared_ptr<Gui::Radio> radio1 = std::make_shared<Gui::Radio>();
+        static std::shared_ptr<Gui::Radio> radio2 = std::make_shared<Gui::Radio>();
+        
+        // 从上到下：checked/unchecked
+        radio1->genObjectSync(lv_screen_active())
+            .setConfig(Gui::RadioConfig::defaultConfig().setChecked(true))
+            .setPos(Gui::ComponentConfig::Pos(300, 50, 30, 30))
+            .show();
+            
+        radio2->genObjectSync(lv_screen_active())
+            .setConfig(Gui::RadioConfig::defaultConfig().setChecked(false))
+            .setPos(Gui::ComponentConfig::Pos(300, 100, 30, 30))
+            .show();
+            
+        // 创建开关组件 - 展示四种状态
+        static std::shared_ptr<Gui::Switch> switch1 = std::make_shared<Gui::Switch>();
+        static std::shared_ptr<Gui::Switch> switch2 = std::make_shared<Gui::Switch>();
+        static std::shared_ptr<Gui::Switch> switch3 = std::make_shared<Gui::Switch>();
+        static std::shared_ptr<Gui::Switch> switch4 = std::make_shared<Gui::Switch>();
+        
+        // 从上到下：开启(亮绿)/关闭(浅灰)/开启(橄榄绿)/关闭(深灰)
+        switch1->genObjectSync(lv_screen_active())
+            .setConfig(Gui::SwitchConfig::defaultConfig().setOn(true))
+            .setPos(Gui::ComponentConfig::Pos(400, 50, 50, 25))
+            .show();
+            
+        switch2->genObjectSync(lv_screen_active())
+            .setConfig(Gui::SwitchConfig::defaultConfig().setOn(false))
+            .setPos(Gui::ComponentConfig::Pos(400, 100, 50, 25))
+            .show();
+            
+        switch3->genObjectSync(lv_screen_active())
+            .setConfig(Gui::SwitchConfig::oliveConfig().setOn(true))
+            .setPos(Gui::ComponentConfig::Pos(400, 150, 50, 25))
+            .show();
+            
+        switch4->genObjectSync(lv_screen_active())
+            .setConfig(Gui::SwitchConfig::oliveConfig().setOn(false))
+            .setPos(Gui::ComponentConfig::Pos(400, 200, 50, 25))
+            .show();
+            
 
         // Run the demo
         // if (!app.runDemo(argc, argv)) {
