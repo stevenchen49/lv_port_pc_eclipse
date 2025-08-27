@@ -23,6 +23,10 @@ add_compile_definitions($<$<BOOL:${LV_USE_FFMPEG}>:LV_USE_FFMPEG=1>)
 
 add_subdirectory(lvgl)
 add_subdirectory(components)
+
+# Add our new declarative UI module
+add_subdirectory(declarative)
+
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
 
 add_executable(main main.c mouse_cursor_icon.c)
@@ -35,6 +39,7 @@ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
 add_executable(main_cpp main.cpp mouse_cursor_icon.c)
 
 target_compile_definitions(main_cpp PRIVATE LV_CONF_INCLUDE_SIMPLE)
+target_include_directories(main_cpp PRIVATE)
 target_link_libraries(main_cpp lvgl lvgl::examples lvgl::demos lvgl::thorvg component_iface component_lv8 ${SDL2_LIBRARIES} m pthread)
 add_custom_target (run_cpp COMMAND ${EXECUTABLE_OUTPUT_PATH}/main_cpp DEPENDS main_cpp)
 
